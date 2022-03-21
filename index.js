@@ -114,9 +114,7 @@ const generateIcons = async (version) => {
           }).toString();
         }
 
-        if (jqel.attr('fill') === '#000000') {
-          jqel.attr('d', newPath).attr('fill', '#ffffff');
-        }
+        jqel.attr('d', newPath);
       });
       
       icon = html.html();
