@@ -134,7 +134,6 @@ const generateIcons = async (version) => {
   await fs.writeFile(`${targetDir}/icons.json`, JSON.stringify(icons, null, 2));
 
   // Copy assets
-  await fs.cp('./assets/cover.png', `${targetDir}/cover.png`);
   await fs.cp('./assets/icon.png', `${targetDir}/icon.png`);
   await fs.cp('./assets/license.txt', `${targetDir}/license.txt`);
   await copyDir(`./assets/previews-${version}`, `${targetDir}/previews`);
