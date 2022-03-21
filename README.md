@@ -3,6 +3,7 @@
 # Building Locally
 
 This package gets all its icons from Apples original repository [SF Symbols 3.2](https://developer.apple.com/sf-symbols/)
+I have removed the basic "number" icons intentionally.
 
 ## Install dependencies
 After cloning this repo, install dependencies by running:
