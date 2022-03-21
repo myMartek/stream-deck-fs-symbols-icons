@@ -1,0 +1,9 @@
+{
+    "Name": "Apple SF Symbols",
+    "Version": "3.2",
+    "Description": "Apple SF Symbols",
+    "Author": "Marcel Wlotzka",
+    "URL": "https://github.com/myMartek/stream-deck-vscode-icons",
+    "Icon": "icon.png",
+    "License": "license.txt"
+}
