@@ -7,7 +7,16 @@ import { zip } from 'zip-a-folder';
 
 const { window } = new JSDOM();
 const $ = jq(window);
-const targetDir = './output/package/com.apple.sfsymbols.sdIconPack';
+const targetDirPlaceholder = './output/package/com.apple.sfsymbols.§VERSION§.sdIconPack';
+
+/**
+ * Capitalizes first letter of a string
+ * @param {string} string 
+ * @returns 
+ */
+const capitalizeFirstLetter = ([first, ...rest]) => {
+  return [first.toUpperCase(), ...rest].join('');
+}
 
 /**
  * Copies a directory with all its children from a to b
@@ -32,13 +41,16 @@ const copyDir = async (src, dest) => {
 
 /**
  * Generates plugin files
+ * 
+ * @param {string} version 
  */
-const generateIcons = async () => {
+const generateIcons = async (version) => {
+  let targetDir = targetDirPlaceholder.replace('§VERSION§', version);
   // Create directories
   await fs.mkdir(`${targetDir}/icons`, { recursive: true });
 
   // Get SVG source files
-  let files = (await fs.readdir('./svg')).map(e => e.replace('.svg', ''));
+  let files = (await fs.readdir(`./svg/${version}`)).map(e => e.replace('.svg', ''));
 
   // initialize icons object with name, path
   let icons = files.map(name => {
@@ -54,7 +66,7 @@ const generateIcons = async () => {
       let name = file.name;
 
       // read the icons source
-      let icon = await fs.readFile(`./svg/${name}.svg`, 'utf-8');
+      let icon = await fs.readFile(`./svg/${version}/${name}.svg`, 'utf-8');
 
       // Append the icon to a jQuery div for easier manipulation
       let html = $('<div />').append(icon);
@@ -101,8 +113,10 @@ const generateIcons = async () => {
             origin: [0, 0]
           }).toString();
         }
-        
-        jqel.attr('d', newPath).attr('fill', 'white');
+
+        if (jqel.attr('fill') === '#000000') {
+          jqel.attr('d', newPath).attr('fill', '#ffffff');
+        }
       });
       
       icon = html.html();
@@ -125,18 +139,35 @@ const generateIcons = async () => {
   await fs.cp('./assets/cover.png', `${targetDir}/cover.png`);
   await fs.cp('./assets/icon.png', `${targetDir}/icon.png`);
   await fs.cp('./assets/license.txt', `${targetDir}/license.txt`);
-  await fs.cp('./assets/manifest.json', `${targetDir}/manifest.json`);
   await copyDir('./assets/previews', `${targetDir}/previews`);
+
+  // Set manifest version and save it to the target directory
+  let versionname = capitalizeFirstLetter(version);
+  let manifest = JSON.parse(await fs.readFile('./assets/manifest.json'));
+  manifest.name = `Apple SF Symbols - ${versionname}`;
+  manifest.Description = `${versionname} variant of Apples SF Symbols`;
+
+  await fs.writeFile(`${targetDir}/manifest.json`, JSON.stringify(manifest, null, 2));
 };
 
 /**
  * Helper function needed for running the async methods
  */
 (async () => {
-  // Generate icon plugin directory
-  await generateIcons();
+  let versions = ['monochrome', 'hierarchical', 'multicolor', 'palette'];
 
-  // create streamDeckIconPack zip file
-  await zip('./output/package', './output/com.apple.sfsymbols.streamDeckIconPack');
-  console.log('com.apple.sfsymbols.streamDeckIconPack written.');
+  for (let i = 0; i < versions.length; i++) {
+    let version = versions[i];
+
+    // Generate icon plugin directory
+    await generateIcons(version);
+
+    // create streamDeckIconPack zip file
+    await zip('./output/package', `./output/com.apple.sfsymbols.${version}.streamDeckIconPack`);
+
+    // Remove tmp dir
+    await fs.rm('./output/package', { recursive: true });
+
+    console.log(`com.apple.sfsymbols.${version}.streamDeckIconPack written.`);
+  }
 })();
