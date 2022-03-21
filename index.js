@@ -137,7 +137,7 @@ const generateIcons = async (version) => {
   await fs.cp('./assets/cover.png', `${targetDir}/cover.png`);
   await fs.cp('./assets/icon.png', `${targetDir}/icon.png`);
   await fs.cp('./assets/license.txt', `${targetDir}/license.txt`);
-  await copyDir('./assets/previews', `${targetDir}/previews`);
+  await copyDir(`./assets/previews-${version}`, `${targetDir}/previews`);
 
   // Set manifest version and save it to the target directory
   let versionname = capitalizeFirstLetter(version);
