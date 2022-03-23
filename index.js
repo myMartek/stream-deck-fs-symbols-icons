@@ -49,11 +49,14 @@ const generateIcons = async (version) => {
   // Create directories
   await fs.mkdir(`${targetDir}/icons`, { recursive: true });
 
+  // Get forbidden files
+  let forbidden = (await fs.readdir('./svg/forbidden')).map(e => e.replace('.svg', ''));
+
   // Get SVG source files
   let files = (await fs.readdir(`./svg/${version}`)).map(e => e.replace('.svg', ''));
 
   // initialize icons object with name, path
-  let icons = files.map(name => {
+  let icons = files.filter(name => !forbidden.includes(name)).map(name => {
     return {
       name,
       path: `${name}.svg`
