@@ -1,6 +1,6 @@
 {
   "name": "stream-deck-fs-symbols-icons",
-  "version": "3.2",
+  "version": "3.2.1",
   "description": "Apples SF Symbols stream deck icons",
   "main": "index.js",
   "type": "module",
